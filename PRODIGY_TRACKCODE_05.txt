@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - States of India</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #4a90e2, #50c878);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            color: white;
+        }
+
+        header {
+            background-color: #ff6347;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 2em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        select, button {
+            font-size: 16px;
+            padding: 12px;
+            margin: 20px;
+            border-radius: 8px;
+            border: 2px solid #ff6347;
+            background-color: white;
+            color: #ff6347;
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #ff6347;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #f25c42;
+        }
+
+        .weather-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px;
+        }
+
+        .weather-card {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 280px;
+            margin: 20px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s ease;
+        }
+
+        .weather-card:hover {
+            transform: translateY(-10px);
+            background-color: #f25c42;
+        }
+
+        .weather-card h3 {
+            font-size: 28px;
+            margin: 15px 0;
+        }
+
+        .weather-card img {
+            width: 100px;
+            height: 100px;
+            margin: 15px 0;
+        }
+
+        .weather-card p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        select, button {
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #3498db;
+        }
+
+        @media screen and (max-width: 600px) {
+            .weather-card {
+                width: 90%;
+            }
+
+            select, button {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    Weather App - States of India
+</header>
+
+<div style="text-align: center;">
+    <select id="stateDropdown">
+        <option value="">Select State</option>
+        <option value="Delhi">Delhi</option>
+        <option value="Mumbai">Mumbai</option>
+        <option value="Kolkata">Kolkata</option>
+        <option value="Bengaluru">Bengaluru</option>
+        <option value="Chennai">Chennai</option>
+        <option value="Hyderabad">Hyderabad</option>
+        <option value="Pune">Pune</option>
+        <option value="Jaipur">Jaipur</option>
+    </select>
+    <button onclick="getWeather()">Get Weather</button>
+</div>
+
+<div class="weather-container" id="weather-container">
+</div>
+
+<script>
+    const apiKey = '36b54db108d9c8fbad69f1d5d04a1d2b';
+
+    function getWeather() {
+        const city = document.getElementById('stateDropdown').value;
+
+        if (!city) {
+            alert("Please select a state!");
+            return;
+        }
+
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city},IN&appid=${apiKey}&units=metric`;
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("City not found or API issue!");
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.cod === 200) {
+                    displayWeatherData(data);
+                } else {
+                    alert("Error fetching data for " + city);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching weather data:", error);
+                alert("There was an error fetching the weather data. Please try again later.");
+            });
+    }
+
+    function displayWeatherData(data) {
+        const weatherContainer = document.getElementById('weather-container');
+        weatherContainer.innerHTML = '';
+
+        const weatherCard = document.createElement('div');
+        weatherCard.classList.add('weather-card');
+
+        const weatherIcon = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+        const weatherDescription = data.weather[0].description;
+
+        weatherCard.innerHTML = `
+            <h3>${data.name}, ${data.sys.country}</h3>
+            <img src="${weatherIcon}" alt="${weatherDescription}">
+            <p>Temperature: ${data.main.temp}°C</p>
+            <p>Weather: ${weatherDescription}</p>
+            <p>Humidity: ${data.main.humidity}%</p>
+            <p>Wind Speed: ${data.wind.speed} m/s</p>
+        `;
+
+        weatherContainer.appendChild(weatherCard);
+    }
+</script>
+
+</body>
+</html>
